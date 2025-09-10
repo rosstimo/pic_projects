@@ -31,7 +31,7 @@ nbproject/private.properties
 # MPLAB X transient logs
 *.log
 *.tlog
-
+*.log.*
 # OS/editor cruft
 .DS_Store
 Thumbs.db
