@@ -1,0 +1,113 @@
+Disassembly Listing for Example
+Generated From:
+/home/tim/MPLABXProjects/pic_projects/Example/Example.X/dist/default/debug/Example.X.debug.elf
+Sep 16, 2025 4:23:08 PM
+
+---  /home/tim/MPLABXProjects/pic_projects/Example/Example.X/main.s  ------------------------------------
+                                                  1:     ; Tim Rossiter
+                                                  2:     ; Fall 2025
+                                                  3:         
+                                                  4:     ; References: 
+                                                  5:     ; MPLAB® XC8 PIC® Assembler User's Guide (DS50002974A), 
+                                                  6:     ; MPLAB® XC8 PIC Assembler User's Guide for Embedded Engineers
+                                                  7:     
+                                                  8:     PROCESSOR 16F883             ; Only if code is written specifically for this device
+                                                  9:     
+                                                  10:    RADIX dec                    ; Set default number base for constant/literal values
+                                                  11:    
+                                                  12:    ; --- PIC16F883 Configuration Bit Settings ---
+                                                  13:    ; CONFIG1
+                                                  14:    CONFIG  FOSC = XT            ; XT oscillator: Crystal/resonator on RA6/OSC2 and RA7/OSC1
+                                                  15:    CONFIG  WDTE = OFF           ; Watchdog Timer Enable bit (WDT disabled)
+                                                  16:    CONFIG  PWRTE = OFF          ; Power-up Timer Enable bit (disabled)
+                                                  17:    CONFIG  MCLRE = ON           ; MCLR pin function is MCLR
+                                                  18:    CONFIG  CP = OFF             ; Program memory code protection is disabled
+                                                  19:    CONFIG  CPD = OFF            ; Data memory code protection is disabled
+                                                  20:    CONFIG  BOREN = OFF          ; Brown out Reset disabled
+                                                  21:    CONFIG  IESO = OFF           ; Internal/External Switchover disabled
+                                                  22:    CONFIG  FCMEN = OFF          ; Fail-Safe Clock Monitor disabled
+                                                  23:    CONFIG  LVP = OFF            ; Low Voltage Programming OFF (HV on MCLR for programming)
+                                                  24:    ; CONFIG2
+                                                  25:    CONFIG  BOR4V = BOR40V
+                                                  26:    CONFIG  WRT = OFF
+                                                  27:    
+                                                  28:    ; --- Include Device/Tool Definitions ---
+                                                  29:    #include <xc.inc>
+                                                  30:    #include <pic16f883.inc>
+                                                  31:    
+                                                  32:    ; --- Variable Definitions ---
+                                                  33:    SOMEVALUE      EQU 0x20            ; user RAM variable
+                                                  34:    WTEMP          EQU 0x70            ; WREG save (common RAM)
+                                                  35:    STATUSTEMP     EQU 0x71            ; STATUS save (common RAM)
+                                                  36:    
+                                                  37:    ; --- Reset and Interrupt Vectors ---
+                                                  38:    PSECT resetVect,class=CODE,delta=2
+07CA  2FDB     GOTO 0x7DB                         39:        GOTO Start
+                                                  40:    
+                                                  41:    PSECT isrVect,class=CODE,delta=2,abs
+                                                  42:        ORG 0x004                     ; Interrupt vector for midrange PICs
+0004  2FF6     GOTO 0x7F6                         43:        GOTO ISR_Handler
+                                                  44:    
+                                                  45:    ; --- Main Code Section ---
+                                                  46:    PSECT code,class=CODE,delta=2
+                                                  47:    
+                                                  48:    Start:
+                                                  49:        ; Usual I/O/BANK init
+07DB  1303     BCF STATUS, 0x6                    50:        BANKSEL INTCON
+07DD  018B     CLRF INTCON                        51:        CLRF   INTCON
+                                                  52:    
+07DE  1303     BCF STATUS, 0x6                    53:        BANKSEL OPTION_REG
+07E0  0181     CLRF OPTION_REG                    54:        CLRF   OPTION_REG
+                                                  55:    
+07E1  1703     BSF STATUS, 0x6                    56:        BANKSEL ANSELH
+07E3  0189     CLRF ANSELH                        57:        CLRF   ANSELH
+                                                  58:    
+07E4  1303     BCF STATUS, 0x6                    59:        BANKSEL IOCB
+07E6  0196     CLRF IOCB                          60:        CLRF   IOCB
+                                                  61:    
+07E7  1303     BCF STATUS, 0x6                    62:        BANKSEL PORTB
+07E9  0186     CLRF TRISB                         63:        CLRF   PORTB
+                                                  64:    
+07EA  1303     BCF STATUS, 0x6                    65:        BANKSEL TRISB
+07EC  0186     CLRF TRISB                         66:        CLRF   TRISB
+                                                  67:    
+07ED  1303     BCF STATUS, 0x6                    68:        BANKSEL WPUB
+07EF  30FF     MOVLW 0xFF                         69:        MOVLW  0xFF
+07F0  0095     MOVWF WPUB                         70:        MOVWF  WPUB
+                                                  71:    
+                                                  72:        ; ----- Interrupt Enable Example -----
+07F1  1303     BCF STATUS, 0x6                    73:        BANKSEL INTCON
+07F3  170B     BSF INTCON, 0x6                    74:        BSF    INTCON,6       ; Peripheral Interrupt Enable
+07F4  178B     BSF INTCON, 0x7                    75:        BSF    INTCON,7       ; Global Interrupt Enable (Do this last)
+07F5  2FFE     GOTO 0x7FE                         76:        GOTO   MainLoop
+                                                  77:    
+                                                  78:    ; --- Interrupt Service Routine: Save/Restore Context (W,STATUS) ---
+                                                  79:    PSECT code
+                                                  80:    ISR_Handler:
+07F6  00F0     MOVWF 0xF0                         81:        MOVWF  WTEMP              ; Save WREG (common RAM, so no banking required)
+07F7  0E03     SWAPF STATUS, W                    82:        SWAPF  STATUS,W           ; Save STATUS to WREG (swap to avoid affecting flags)
+07F8  00F1     MOVWF 0xF1                         83:        MOVWF  STATUSTEMP         ; Save STATUS
+                                                  84:    
+                                                  85:        ; (Add interrupt source checks and logic here...)
+                                                  86:        ; Example: check TMR0IF and handle; clear flags as needed
+                                                  87:    
+                                                  88:        ; --- End of ISR, restore context ---
+07F9  0E71     SWAPF 0x71, W                      89:        SWAPF  STATUSTEMP,W       ; Restore STATUS to proper value
+07FA  0083     MOVWF STATUS                       90:        MOVWF  STATUS
+07FB  0EF0     SWAPF 0x70, F                      91:        SWAPF  WTEMP,F
+07FC  0E70     SWAPF 0x70, W                      92:        SWAPF  WTEMP,W
+                                                  93:    
+07FD  0009     RETFIE                             94:        RETFIE
+                                                  95:    
+                                                  96:    ; --- Lookup Table Section (example: sine wave values as bytes) ---
+                                                  97:    PSECT tblCode,class=CODE,delta=2
+                                                  98:    LookupTbl:
+07CB  0000     NOP                                99:        DB 0,25,49,71,90,107,120,127,127,120,107,90,71,49,25,0
+                                                  100:   
+                                                  101:   PSECT code
+                                                  102:   ; --- Main Program Loop (Loops Forever) ---
+                                                  103:   MainLoop:
+07FE  0A86     INCF PORTB, F                      104:       INCF   PORTB,1
+07FF  2FFE     GOTO 0x7FE                         105:       GOTO   MainLoop
+                                                  106:   
+                                                  107:   END     ; Required by assembler
