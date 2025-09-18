@@ -38,3 +38,7 @@ Thumbs.db
 *.swp
 *.bak
 *.tmp
+/DelayExample/DelayExample.X/build/
+/DelayExample/DelayExample.X/dist/
+/LookupTable/LookupTable.X/build/
+/LookupTable/LookupTable.X/dist/
