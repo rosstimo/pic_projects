@@ -37,6 +37,7 @@ CONFIG  WRT = OFF
 
 toggle_mask    EQU 00000001B       ; used with xor i's toggle 0's stay the same
 count_inner    EQU 0x20     
+count_outer    EQU 0x21
     
 ; --- Reset and Interrupt Vectors ---
 PSECT resetVect,class=CODE,space=0,delta=2 ;Linker option -presetVec=0h
@@ -76,11 +77,19 @@ PSECT code
 MainLoop:
     MOVLW toggle_mask		;1
     XORWF PORTB,1		;1
-    MOVLW 0x05			;1
+    
+Delay:
+    MOVLW 0xEE			;1
+    MOVWF count_outer		;1
+OuterDelayLoop:			;(((3)count_inner + 1)+1+2)count_outer-1+1+1 or ((3)count_inner + 4 )count_outer + 1
+    MOVLW 0x09			;1 n=9 delay is 28us at 4MHz Osc.
     MOVWF count_inner		;1
-InnerDelay:			;(1+2)*5-1+1+1+1+1 or (3)n+3 max: min: delta:
+InnerDelayLoop:			;(1+2)*5-1+1+1 or (3)n+1 max:769 min:4 delta:3
     DECFSZ count_inner,1	;1(2)
-    GOTO InnerDelay		;2
+    GOTO InnerDelayLoop		;2
+    DECFSZ count_outer,1	;1(2)
+    GOTO OuterDelayLoop		;2
+    
     GOTO   MainLoop		;2
 
 END     ; Required by assembler
