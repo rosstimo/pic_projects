@@ -1,7 +1,7 @@
 # MPLAB X IDE user-specific and generated files
-nbproject/private/
-nbproject/Makefile-local-*.mk
-nbproject/Makefile-genesis.properties
+**/nbproject/private/
+**/nbproject/Makefile-local-*.mk
+**/nbproject/Makefile-genesis.properties
 
 # Build output directories
 build/
