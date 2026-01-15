@@ -17,7 +17,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>../../FirstProject-02/FirstProject-02.X/main.S</itemPath>
+      <itemPath>../main.S</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
@@ -34,7 +34,7 @@
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>pic-as</languageToolchain>
         <languageToolchainVersion>3.10</languageToolchainVersion>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <packs>
         <pack name="PIC16Fxxx_DFP" vendor="Microchip" version="1.6.156"/>
