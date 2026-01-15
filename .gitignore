@@ -1,42 +1,22 @@
-# Explicit ignore
-*~
-
-# User Crap
-**/private/*
-
-# MPLAB X project garbage
+# MPLAB X IDE user-specific and generated files
 nbproject/private/
-nbproject/Makefile-*
-nbproject/configurations.xml
-nbproject/private.properties
+nbproject/Makefile-local-*.mk
+nbproject/Makefile-genesis.properties
 
-# Build outputs (object files, ELF, HEX, map, etc.)
-**/build/*
-**/dist/*
-*.o
-*.d
-*.p1
-*.dct
-*.lst
-*.cod
-*.map
-*.elf
-*.cof
-*.hex
-*.sdb
-*.sym
-*.obj
-*.exe
+# Build output directories
+build/
+dist/
 
-# MPLAB X transient logs
-*.log
-*.tlog
-*.log.*
-# OS/editor cruft
-.DS_Store
-Thumbs.db
-*.swp
+# Debug, disassembly, and other generated output
+debug/
+disassembly/
+
+# Backup and temporary files
+*~
 *.bak
-*.tmp
-/Example/Example.X/build/
-/Example/Example.X/dist/
+*.swp
+
+# Compiled output and map files
+*.elf
+*.hex
+*.map
