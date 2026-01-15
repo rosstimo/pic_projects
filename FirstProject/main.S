@@ -5,6 +5,20 @@
 ;Program/Project
 ;Git URL
 
+;ReferencesMPLAB® XC8 PIC® Assembler User's Guide
+;https://ww1.microchip.com/downloads/en/DeviceDoc/MPLAB%20XC8%20PIC%20Assembler%20User's%20Guide%2050002974A.pdf
+;
+;MPLAB® XC8 PIC Assembler User's Guide for Embedded Engineers
+;https://www.google.com/search?q=pic+assembly+user%27s+guide
+;    
+;PIC16F882/883/884/886/887 Data Sheet
+;https://ww1.microchip.com/downloads/aemDocuments/documents/OTH/ProductDocuments/DataSheets/40001291H.pdf
+
+PROCESSOR 16F883 ; this is only if code is written specifically for this device
+    
+RADIX dec ;this sets the default number base for constant/literal values. Can be hex, dec, oct. Should be dec if ommited
+    
+    
 ;Device Setup
 ;-----------------------------------------------------
 ;PROCESSOR pic16f883 
@@ -29,21 +43,53 @@
 ;Include Statements
 #include <xc.inc>
 
-;Code Section
-;-----------------------------------------------------
-    
-;Register/Variable Setup
-    SOMEVALUE EQU 0x5f ; asign a value to a variable
-    
-;Start of Program
+; --- Variable Definitions ---
+SOMEVALUE      EQU 0x20            ; user RAM variable
+WTEMP          EQU 0x70            ; WREG save (common RAM)
+STATUSTEMP     EQU 0x71            ; STATUS save (common RAM)
+     
+     
+     
+;Program Sections (PSECT)
 
-; reset vector
+/* The following PSECTs are already defined in pic16f883.inc
+     
+//Memory Spaces (see Assembler User's Guide Table: 4-11 for for space flags)
+#define SPACE_CODE   0
+#define SPACE_DATA   1
+#define SPACE_EEPROM 3
+
+psect udata_shr,class=COMMON,space=SPACE_DATA,noexec
+psect udata,class=RAM,space=SPACE_DATA,noexec
+psect udata_bank0,class=BANK0,space=SPACE_DATA,noexec
+psect udata_bank1,class=BANK1,space=SPACE_DATA,noexec
+psect udata_bank2,class=BANK2,space=SPACE_DATA,noexec
+psect code,class=CODE,space=SPACE_CODE,delta=2
+psect data,class=STRCODE,space=SPACE_CODE,delta=2,noexec
+psect edata,class=EEDATA,space=SPACE_EEPROM,delta=2,noexec
+*/
+     
+;If you want to tell the linker to put the code in a specific program memory address
+;terminal option: -Wl,-presetVect=0h,-Wl,-pisrVect=04h,-Wl,-pcode=08h
+;MPLABX:
+;Project Properties ? pic-as Linker ? General ? ?Custom linker options?:
+;Add: -presetVec=0h
+;Add: -pisrVec=4h
+;and so on...
+     
+
+
+; --- Reset Vector ---
 PSECT resetVect,class=CODE,delta=2
-    GOTO Start
-       
-;Setup Code that runs once at power up/reset
+    GOTO Setup
+    
+; --- Interrupt Vector ---
+PSECT isrVect,class=CODE,delta=2                   
+    GOTO ISR_Handler
+
+; --- Main Code Section ---
 PSECT code,class=CODE,delta=2
-Start:
+Setup:
     BANKSEL INTCON
     CLRF INTCON
     
@@ -73,4 +119,21 @@ MainLoop:
     INCF PORTB,1
     GOTO MainLoop
     
+; --- Interrupt Service Routine: Save and Restore Context (W,STATUS) ---
+PSECT code
+ISR_Handler:
+    MOVWF WTEMP			; Save WREG (common RAM, so no banking required)
+    SWAPF STATUS,W		; Save STATUS to WREG (swap to avoid affecting flags)
+    SWAPF STATUSTEMP,F		; Save STATUS
+
+    ; (Add interrupt source checks and logic here...)
+    ; Example: check TMR0IF and handle; clear flags as needed
+
+    ; --- End of ISR, restore context ---
+    SWAPF  STATUSTEMP,W		; Restore STATUS to proper value
+    SWAPF  STATUS,F
+    SWAPF  WTEMP,F		; Restore W without touching status flags
+    SWAPF  WTEMP,W		; Restore W without touching status flags
+    RETFIE
+
 END ; End of code. This is required
