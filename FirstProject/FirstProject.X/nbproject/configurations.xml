@@ -17,7 +17,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>../main.s</itemPath>
+      <itemPath>../../FirstProject-02/FirstProject-02.X/main.S</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
