@@ -71,7 +71,6 @@ RADIX dec ;this sets the default number base for constant/literal values. Can be
 ; ------------------------------------------------------------
 
 PSECT resetVect,class=CODE,delta=2
-resetVec:
     PAGESEL main
     goto    main
 
@@ -89,7 +88,7 @@ main:
     clrf    PORTB                   ; start with PORTB = 0
 
     BANKSEL TRISC
-    bsf     TRISC7                  ; RC7/RX is an input ;datasheet says pin is an input anyway 12.1.2.1
+    bsf     TRISC7                  ; RC7/RX is an input ; may be redundant. datasheet says pin is an input anyway 12.1.2.1
 
     ; Setup baud rate
     ; 9600 baud at 4 MHz with BRGH = 1, BRG16 = 0, SPBRG = 25
@@ -129,10 +128,12 @@ MainLoop:
     goto    MainLoop
 
     ; Check status and errors
+    ; Check for overrun error
     BANKSEL RCSTA
     btfsc   OERR
     goto    ResetReceiver
-
+    
+    ; Check for framing error
     BANKSEL RCSTA
     btfsc   FERR
     goto    FramingError
