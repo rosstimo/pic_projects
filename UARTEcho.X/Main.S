@@ -177,15 +177,13 @@ ProcessRxByte:
     ; Get the received byte
     BANKSEL rxByte
     MOVF    BANKMASK(rxByte), W
+
+    ; Process byte here
+    CALL    TxByte        ; Echo byte back
+
     ; Mark the byte as consumed
     BANKSEL rxStatus
     BCF     BANKMASK(rxStatus), RX_READY_BIT
-
-    ;actually process byte here
-    BANKSEL rxByte
-    MOVF    rxByte,W ; Move byte to Tx temp storage for transmission
-    CALL    TxByte        ; Echo byte back
-
     RETURN
 
 ; ------------------------------------------------------------
