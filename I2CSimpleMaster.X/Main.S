@@ -130,7 +130,7 @@ AddrNack:
 
 SendData:
     BANKSEL SSPBUF
-    movlw   0xA5                ;Data byte to send
+    movlw   0x55                ;Data byte to send
     movwf   SSPBUF              ;Load the data byte into the SSPBUF to start transmission
 
 WaitData:
