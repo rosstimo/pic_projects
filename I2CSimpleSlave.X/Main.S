@@ -65,7 +65,7 @@ Setup:
 
     BANKSEL SSPSTAT             
     clrf    SSPSTAT             ; Ensure Default state.
-    movfw   SSPBUF, w           ; Explicitly clear BF bit with read of SSPBUF
+    movf   SSPBUF, w           ; Explicitly clear BF bit with read of SSPBUF
 
     BANKSEL SSPCON2
     clrf    SSPCON2             ; Ensure Default state.
