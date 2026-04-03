@@ -49,10 +49,8 @@ Setup:
     BANKSEL ANSEL
     clrf    ANSEL
     clrf    ANSELH
-
     BANKSEL PORTB
     clrf    PORTB
-
     BANKSEL TRISB
     clrf    TRISB
 
@@ -64,7 +62,6 @@ Setup:
     ; MSSP setup
     BANKSEL SSPCON          
     clrf    SSPCON                  ;Clear SSPCON before configuring
-
     BANKSEL SSPCON2
     clrf    SSPCON2                 ;Clear SSPCON2 before configuring
 
@@ -87,10 +84,12 @@ Setup:
     movwf   SSPCON
 
     BANKSEL PIR1
-    bcf     SSPIF
+    bcf     SSPIF               ;clear MSSP interrupt flag again
 
 MainLoop:
     call    SendOnce
+Wait:
+    ;goto    Wait
     goto    MainLoop
 
 SendOnce:
@@ -110,7 +109,6 @@ WaitStart:
     BANKSEL SSPBUF              ; ADDRESS BYTE: 7-bit slave address 0x50, write bit = 0
     movlw   0xA0                ; bus byte = 0xA0 or 1010000w
     movwf   SSPBUF              ;Load the address byte into the SSPBUF to start transmission
-
 WaitAddr:
     BANKSEL PIR1
     btfss   SSPIF               ;Wait for address byte to be sent
@@ -151,7 +149,6 @@ DataNack:
 SendStop:
     BANKSEL SSPCON2
     bsf     PEN                 ;Initiate STOP condition on the bus
-
 WaitStop:
     btfsc   PEN                 ;Wait for STOP condition to complete
     goto    WaitStop
