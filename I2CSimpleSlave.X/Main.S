@@ -65,11 +65,13 @@ Setup:
 
     BANKSEL SSPSTAT             
     clrf    SSPSTAT             ; Ensure Default state.
-    movf   SSPBUF, w           ; Explicitly clear BF bit with read of SSPBUF
+    movf    SSPBUF, w            ; Explicitly clear BF bit with read of SSPBUF
 
     BANKSEL SSPCON2
     clrf    SSPCON2             ; Ensure Default state.
 
+    BANKSEL PIR1
+    bcf     SSPIF               ; Clear MSSP interrupt flag
     ;---------------------------------------------
     ; choose one test mode
     ;---------------------------------------------
