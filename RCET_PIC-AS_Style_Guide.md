@@ -6,6 +6,27 @@
 
 ---
 
+## Table of Contents
+
+- [1. Purpose](#1-purpose)
+- [2. Core Rule](#2-core-rule)
+- [3. Required File Conventions](#3-required-file-conventions)
+- [4. Standard File Layout](#4-standard-file-layout)
+- [5. Case and Naming Rules](#5-case-and-naming-rules)
+- [6. Literal and Number Rules](#6-literal-and-number-rules)
+- [7. Comment Rules](#7-comment-rules)
+- [8. Whitespace and Alignment Rules](#8-whitespace-and-alignment-rules)
+- [9. Configuration Bit Rules](#9-configuration-bit-rules)
+- [10. Banking Rules](#10-banking-rules)
+- [11. PSECT Rules](#11-psect-rules)
+- [12. Subroutine Style Rules](#12-subroutine-style-rules)
+- [13. ISR Style Rules](#13-isr-style-rules)
+- [14. Good and Bad Examples](#14-good-and-bad-examples)
+- [15. RCET Course Checklist](#15-rcet-course-checklist)
+- [16. Short Rationale Summary](#16-short-rationale-summary)
+- [17. Standards Basis and Manual References](#17-standards-basis-and-manual-references)
+- [18. Final Rule](#18-final-rule)
+
 ## 1. Purpose
 
 This style guide defines the **required formatting and naming conventions** for RCET PIC-AS assembly projects.
@@ -92,53 +113,7 @@ Arrange each source file in this order unless the assignment requires something 
 
 ### 4.1 Recommended Template
 
-```assembly
-;=====================================================
-; Name:        Tim Rossiter
-; Course:      RCET xxxx
-; Semester:    Fall 2026
-; Assignment:  Lab xx
-; Device:      PIC16F883
-; Toolchain:   MPLAB X + pic-as
-;=====================================================
-
-PROCESSOR 16F883
-RADIX dec
-
-#include <xc.inc>
-
-CONFIG "FOSC = XT"
-CONFIG "WDTE = OFF"
-CONFIG "PWRTE = OFF"
-CONFIG "MCLRE = ON"
-CONFIG "LVP = OFF"
-
-count_reg       EQU 0x20
-w_temp          EQU 0x70
-status_temp     EQU 0x71
-pclath_temp     EQU 0x72
-
-PSECT resetVect,class=CODE,delta=2
-ResetVector:
-    goto Setup
-
-PSECT isrVect,class=CODE,delta=2
-InterruptVector:
-    goto IsrHandler
-
-PSECT code,class=CODE,delta=2
-
-Setup:
-    goto MainLoop
-
-MainLoop:
-    goto MainLoop
-
-IsrHandler:
-    retfie
-
-END
-```
+See the recommended template in [Template_Main.S](Template_Main.S) in this directory.
 
 ---
 
@@ -716,6 +691,7 @@ Example:
 ; Input:  none
 ; Output: none
 ; Uses:   delay_count
+; Max stack depth: 1
 ;-----------------------------------------------------
 Delay50us:
     return
