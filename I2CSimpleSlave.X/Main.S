@@ -65,40 +65,50 @@ Setup:
 
     BANKSEL SSPSTAT             
     clrf    SSPSTAT             ; Ensure Default state.
-    movf    SSPBUF, w            ; Explicitly clear BF bit with read of SSPBUF
+    movf    SSPBUF, w           ; Explicitly clear BF bit with read of SSPBUF
 
     BANKSEL SSPCON2
     clrf    SSPCON2             ; Ensure Default state.
 
     BANKSEL PIR1
     bcf     SSPIF               ; Clear MSSP interrupt flag
+
     ;---------------------------------------------
-    ; choose one test mode
+    ; Slave Mode Setup
     ;---------------------------------------------
 
     ; specific 7-bit slave address = 0x50
-    BANKSEL SSPADD
-    movlw   0xA0                ;bus byte = 0xA0 or 1010000w
+    BANKSEL SSPADD              ; bit 7 = 1, respond to general call address 0x00
+    movlw   0xA0                ;bus byte = 0xA0 or 10100000B for slave address 0x50 in SSPADD<7:1>
     movwf   SSPADD
 
-    ; for GENERAL CALL testing, uncomment this:
+    ; Set SSPCON2 Slave options
     BANKSEL SSPCON2
-    bsf     GCEN
+    bsf     GCEN                ; GCEN = 1, enable general call address 0x00
+    bcf     SEN                 ; SEN = 0, slave clock stretching disabled
 
-    ; SSPEN=1, CKP=1, SSPM<3:0>=0110 -> I2C slave 7-bit
+    ; SSPEN=0, CKP=0, SSPM<3:0>=0110 -> I2C slave 7-bit
+    ; keep MSSP disabled until we finish configuring to avoid unintended behavior on the bus
+    ; hold the bus with clock stretching until we're done configuring
     BANKSEL SSPCON
-    movlw   0x36
+    movlw   0x06
     movwf   SSPCON
 
-    BANKSEL PIR1
-    bcf     SSPIF
+    ;Enable MSSP module
+    bsf     SSPEN
+    ;Release the bus with clock stretching after MSSP is enabled
+    bsf     CKP
 
 MainLoop:
+    ; debug: show activity
+    BANKSEL PORTB
+    bcf     PORTB, 0
+
     BANKSEL PIR1
-    btfss   SSPIF
+    btfss   SSPIF           ; wait for MSSP flag
     goto    MainLoop
 
-    ; optional debug: show activity
+    ; debug: show activity
     BANKSEL PORTB
     bsf     PORTB, 0
 
@@ -106,15 +116,16 @@ MainLoop:
     BANKSEL SSPBUF
     movf    SSPBUF, w
     BANKSEL dummy
-    movwf   dummy
+    movwf   dummy           ; save byte
 
-    ; if overflow happened, clear it
+    ; reset bus
     BANKSEL SSPCON
-    bcf     SSPOV
-
-    ; clear MSSP flag
+    bcf     SSPOV           ; crear overflow
+    bcf     WCOL            ; clear collision
     BANKSEL PIR1
-    bcf     SSPIF
+    bcf     SSPIF           ; clear MSSP flag
+    
+    bsf     CKP             ;Must release the bus if clock stratching is enabled
 
     goto    MainLoop
 
