@@ -305,8 +305,6 @@ ReadRequestFromMaster:
     bsf     i2c_flags, I2CF_R_W         ; set R/W flag to indicate read request from master
     BANKSEL i2c_tx_byte
     movf    i2c_tx_byte, w              ; first byte to send
-    BANKSEL SSPBUF
-    movwf   SSPBUF                      ; queue first transmit byte now
     goto    LeaveI2cSlave               ; for now we just set the flag and leave.
 
 WriteRequestFromMaster:
