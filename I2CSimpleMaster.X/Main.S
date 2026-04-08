@@ -107,7 +107,7 @@ WaitStart:
     BANKSEL PORTB
     bsf     PORTB, 0            ;set start complete
     BANKSEL SSPBUF              ; ADDRESS BYTE: 7-bit slave address 0x50, write bit = 0
-    movlw   0xA0                ; bus byte = 0xA0 or 1010000w
+    movlw   0xA1                ; bus byte = 0xA0 or 1010000w
     movwf   SSPBUF              ;Load the address byte into the SSPBUF to start transmission
 WaitAddr:
     BANKSEL PIR1
