@@ -37,20 +37,20 @@ CONFIG "WRT = OFF"
 ;-----------------------------------------------------
 ; I2C flag bits for i2c_flags
 ;-----------------------------------------------------
-I2CF_D0             EQU 0               ; count consecutive data bytes received or transmitted, can be used for tracking position in a multi-byte transfer
-I2CF_D1             EQU 1               ; count consecutive data bytes received or transmitted, can be used for tracking position in a multi-byte transfer
-I2CF_D2             EQU 2               ; count consecutive data bytes received or transmitted, can be used for tracking position in a multi-byte transfer
-I2CF_D_A            EQU 3               ; data/address bit
-I2CF_R_W            EQU 4               ; read/write bit
-I2CF_GENERAL_CALL   EQU 5               ; general call bit
-I2CF_OVERFLOW       EQU 6               ; overflow bit
-I2CF_COLLISION      EQU 7               ; collision bit
+I2CF_D0             EQU 0            ; count consecutive data bytes received or transmitted, can be used for tracking position in a multi-byte transfer
+I2CF_D1             EQU 1            ; count consecutive data bytes received or transmitted, can be used for tracking position in a multi-byte transfer
+I2CF_D2             EQU 2            ; count consecutive data bytes received or transmitted, can be used for tracking position in a multi-byte transfer
+I2CF_D_A            EQU 3            ; data/address bit
+I2CF_R_W            EQU 4            ; read/write bit
+I2CF_GENERAL_CALL   EQU 5            ; general call bit
+I2CF_OVERFLOW       EQU 6            ; overflow bit
+I2CF_COLLISION      EQU 7            ; collision bit
 
 ;-----------------------------------------------------
 ; I2C SSPSTAT bits in i2c_status_snapshot
 ;-----------------------------------------------------
-SSPSTAT_R_W         EQU 2               ;descriptive name for read/write bit
-SSPSTAT_D_A         EQU 5               ;descriptive name for data/address bit
+STAT_R_W         EQU 2               ;descriptive name for read/write bit
+STAT_D_A         EQU 5               ;descriptive name for data/address bit
 ;-----------------------------------------------------
 ; Shared / common RAM 0x70 to 0x7F. All Banks can access.
 ;-----------------------------------------------------
@@ -166,8 +166,8 @@ Setup:
 ;   Enable Interrupts
 ;----------------------------------
     BANKSEL INTCON
-    bsf     PEIE                    ; peripheral interrupts enabled
-    bsf     GIE                     ; global interrupts enabled
+    bsf     PEIE                ; peripheral interrupts enabled
+    bsf     GIE                 ; global interrupts enabled
     goto    MainLoop
 
 ;------------------------------------------------------------------------------
@@ -245,45 +245,42 @@ LeaveIsr:
 ; Stack Depth: 1
 ;--------------------------------------
 ServiceI2cSlave:
-    ; check for error conditions and call ResetI2c if needed
 CheckOverflow:
     BANKSEL SSPCON
-    btfss   SSPOV                       ; check for receive overflow error
-    goto    CheckCollision              ; if no overflow, check for collision error
-    bcf     SSPOV                       ; clear SSPOV to allow new reception
+    btfss   SSPOV                           ; check for receive overflow error
+    goto    CheckCollision                  ; if no overflow, check for collision error
     BANKSEL i2c_flags
     bsf     i2c_flags, I2CF_OVERFLOW
-    goto    ResetBus                    ; reset bus and leave
+    goto    ResetBus                        ; reset bus and leave
 CheckCollision:
     BANKSEL SSPCON
-    btfss   WCOL                        ; check for write collision error
-    goto    SaveSSPSTAT                 ; if no collision, continue
-    bcf     WCOL                        ; clear WCOL to allow new transmission
+    btfss   WCOL                            ; check for write collision error
+    goto    SaveSSPSTAT                     ; if no collision, continue
     BANKSEL i2c_flags
     bsf     i2c_flags, I2CF_COLLISION
-    goto    ResetBus                    ; reset bus and leave
-SaveSSPSTAT:
+    goto    ResetBus                        ; reset bus and leave
+    SaveSSPSTAT:
     BANKSEL SSPSTAT
-    movf    SSPSTAT, w                  ;Snapshot SSPSTAT so decisions are stable.
+    movf    SSPSTAT, w                      ;Snapshot SSPSTAT so decisions are stable.
     BANKSEL i2c_status_snapshot
     movwf   i2c_status_snapshot
-    btfss   i2c_status_snapshot, SSPSTAT_D_A    ; if this is an address or data byte
-    goto    IsAddressByte                       ; if D/A=0, this is an address byte
-    goto    IsDataByte                          ; if D/A=1, this is a data byte
+    btfss   i2c_status_snapshot, STAT_D_A   ; if this is an address or data byte
+    goto    IsAddressByte                   ; if D/A=0, this is an address byte
+    goto    IsDataByte                      ; if D/A=1, this is a data byte
 
 IsAddressByte:
     BANKSEL i2c_flags
-    bcf     i2c_flags, I2CF_D_A         ; clear D/A
+    bcf     i2c_flags, I2CF_D_A             ; clear D/A
     BANKSEL SSPBUF
-    movf    SSPBUF, w                   ; read address byte to clear BF bit and get address
+    movf    SSPBUF, w                       ; read address byte to clear BF bit and get address
     BANKSEL i2c_last_address_byte
     movwf   i2c_last_address_byte
 CheckGeneralCall:
     movlw   0x00
     xorwf   i2c_last_address_byte, w
-    btfsc   ZERO                        ; check if STATUS ZERO bit is set 
-    goto    ServiceGeneralCall          ; is general call address 0x00
-    goto    ServiceAddressMatch         ; not general call
+    btfsc   ZERO                            ; check if STATUS ZERO bit is set 
+    goto    ServiceGeneralCall              ; is general call address 0x00
+    goto    ServiceAddressMatch             ; not general call
 
 ServiceGeneralCall:
     BANKSEL i2c_flags
@@ -293,60 +290,60 @@ ServiceGeneralCall:
 ServiceAddressMatch:
     ; additional address matching can be done here if desired, 
     ; but for now we just assume any non-general call address is a match
-    goto    CheckReadWrite              ; continue
+    goto    CheckReadWrite                  ; continue
 CheckReadWrite:
     BANKSEL i2c_status_snapshot
-    btfsc   i2c_status_snapshot, SSPSTAT_R_W    ; check R/W bit
-    goto    ReadRequestFromMaster       ; if R/W=1, master is requesting to read from slave
-    goto    WriteRequestFromMaster      ; if R/W=0, master is requesting to write to slave
+    btfsc   i2c_status_snapshot, STAT_R_W   ; check R/W bit
+    goto    ReadRequestFromMaster           ; if R/W=1, master is requesting to read from slave
+    goto    WriteRequestFromMaster          ; if R/W=0, master is requesting to write to slave
 
 ReadRequestFromMaster:
     BANKSEL i2c_flags
-    bsf     i2c_flags, I2CF_R_W         ; set R/W flag to indicate read request from master
+    bsf     i2c_flags, I2CF_R_W             ; set R/W flag to indicate read request from master
     BANKSEL i2c_tx_byte
-    movf    i2c_tx_byte, w              ; first byte to send
+    movf    i2c_tx_byte, w                  ; first byte to send
     BANKSEL SSPBUF
-    movwf   SSPBUF                      ; queue first transmit byte now
-    goto    LeaveI2cSlave               ; for now we just set the flag and leave.
+    movwf   SSPBUF                          ; queue first transmit byte now
+    goto    LeaveI2cSlave                   ; for now we just set the flag and leave.
 
 WriteRequestFromMaster:
     BANKSEL i2c_flags
-    bcf     i2c_flags, I2CF_R_W         ; clear R/W flag to indicate write request from master 
-    goto    LeaveI2cSlave               ; for now we just clear the flag and leave.
+    bcf     i2c_flags, I2CF_R_W             ; clear R/W flag to indicate write request from master 
+    goto    LeaveI2cSlave                   ; for now we just clear the flag and leave.
 
 IsDataByte:
     BANKSEL i2c_flags                   
-    bsf     i2c_flags, I2CF_D_A         ; set D/A flag to indicate this is a data byte
-    btfsc   i2c_flags, I2CF_R_W         ; check R/W bit to determine if master is requesting a read or write
-    goto    DataReadFromSlave           ; master is requesting to read from slave
-    goto    DataWriteToSlave            ; master is writing data to slave
+    bsf     i2c_flags, I2CF_D_A             ; set D/A flag to indicate this is a data byte
+    btfsc   i2c_flags, I2CF_R_W             ; check R/W bit to determine if master is requesting a read or write
+    goto    DataReadFromSlave               ; master is requesting to read from slave
+    goto    DataWriteToSlave                ; master is writing data to slave
 
 DataReadFromSlave:
     BANKSEL i2c_tx_byte
-    movf    i2c_tx_byte, w              ; next byte to send
+    movf    i2c_tx_byte, w                  ; next byte to send
     BANKSEL SSPBUF
-    movwf   SSPBUF                      ; queue next byte
-    goto    LeaveI2cSlave               ; for now we just load the data byte and set the flag, then leave.
+    movwf   SSPBUF                          ; queue next byte
+    goto    LeaveI2cSlave                   ; for now we just load the data byte and set the flag, then leave.
 
 DataWriteToSlave:
     BANKSEL SSPBUF
-    movf    SSPBUF, w                   ; read data byte to clear BF bit and get data
+    movf    SSPBUF, w                       ; read data byte to clear BF bit and get data
     BANKSEL i2c_rx_byte         
-    movwf   i2c_rx_byte                 ; save received data byte for main loop to process
+    movwf   i2c_rx_byte                     ; save received data byte for main loop to process
     BANKSEL i2c_flags
-    bcf     i2c_flags, I2CF_R_W         ; clear R/W
-    goto    LeaveI2cSlave               ; for now we just read the data byte and leave.
+    bcf     i2c_flags, I2CF_R_W             ; clear R/W
+    goto    LeaveI2cSlave                   ; for now we just read the data byte and leave.
 
 ResetBus:
     BANKSEL SSPCON
-    bcf     WCOL                        ; clear WCOL to allow new transmission
-    bcf     SSPOV                       ; clear SSPOV to allow new reception
+    bcf     WCOL                            ; clear WCOL to allow new transmission
+    bcf     SSPOV                           ; clear SSPOV to allow new reception
     BANKSEL SSPBUF
-    movf    SSPBUF, w                   ; clear BF bit by reading SSPBUF
+    movf    SSPBUF, w                       ; clear BF bit by reading SSPBUF
 LeaveI2cSlave:
     BANKSEL PIR1
-    bcf     SSPIF                       ; clear MSSP interrupt flag
+    bcf     SSPIF                           ; clear MSSP interrupt flag
     BANKSEL SSPCON
-    bsf   CKP                           ;release the clock if clock stretching is enabled
+    bsf   CKP                               ;release the clock if clock stretching is enabled
     goto LeaveIsr
 END
