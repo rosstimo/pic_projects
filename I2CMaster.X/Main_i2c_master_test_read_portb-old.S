@@ -61,11 +61,9 @@ GC_DATA_NACK_PATTERN    EQU 0x81
 ;------------------------------------------------------------------------------
 ; Variables
 ;------------------------------------------------------------------------------
-readByte0    EQU 0x20
-readByte1    EQU 0x21
-readByte2    EQU 0x22
-innerDelay   EQU 0x23
-outerDelay   EQU 0x24
+readByte        EQU 0x20
+innerDelay      EQU 0x21
+outerDelay      EQU 0x22
 
 ;------------------------------------------------------------------------------
 ; Reset Vector
@@ -123,24 +121,18 @@ Setup:
     BANKSEL PIR1
     bcf     SSPIF
 
-    BANKSEL readByte0
-    clrf    readByte0
+    BANKSEL readByte
+    clrf    readByte
 
 MainLoop:
-    ;call    TestWrite
-    ;call    VisibleDelay
-
-    ;call    TestGeneralCall
-    ;call    VisibleDelay
-
-    ;call    TestRead
-    ;call    VisibleDelay
-
-    call    TestWrite3
+    call    TestWrite
     call    VisibleDelay
 
-    ;call    TestRead3
-    ;call    VisibleDelay
+    call    TestGeneralCall
+    call    VisibleDelay
+
+    call    TestRead
+    call    VisibleDelay
 
     goto    MainLoop
 
@@ -211,14 +203,14 @@ TestRead:
 
     call    I2cReceiveByte
 
-    BANKSEL readByte0
-    movwf   readByte0
+    BANKSEL readByte
+    movwf   readByte
 
     call    I2cMasterNack
     call    I2cStop
 
-    BANKSEL readByte0
-    movf    readByte0, w
+    BANKSEL readByte
+    movf    readByte, w
     BANKSEL PORTB
     movwf   PORTB
     return
@@ -275,114 +267,6 @@ TestGeneralCallDataNack:
 
     BANKSEL PORTB
     movlw   GC_DATA_NACK_PATTERN
-    movwf   PORTB
-    return
-
-;------------------------------------------------------------------------------
-; Multiple Byte Write Test
-; START -> 0xA0 -> 0x11 -> 0x22 -> 0x33 -> STOP
-;------------------------------------------------------------------------------
-TestWrite3:
-    BANKSEL PORTB
-    clrf    PORTB
-
-    call    I2cStart
-
-    movlw   SLAVE_ADDR_WRITE
-    call    I2cSendByte
-    BANKSEL SSPCON2
-    btfsc   ACKSTAT
-    goto    TestWrite3AddrNack
-
-    movlw   0x11
-    call    I2cSendByte
-    BANKSEL SSPCON2
-    btfsc   ACKSTAT
-    goto    TestWrite3DataNack
-
-    movlw   0x22
-    call    I2cSendByte
-    BANKSEL SSPCON2
-    btfsc   ACKSTAT
-    goto    TestWrite3DataNack
-
-    movlw   0x33
-    call    I2cSendByte
-    BANKSEL SSPCON2
-    btfsc   ACKSTAT
-    goto    TestWrite3DataNack
-
-    call    I2cStop
-
-    BANKSEL PORTB
-    movlw   0x31
-    movwf   PORTB
-    return
-
-TestWrite3AddrNack:
-    call    I2cStop
-    BANKSEL PORTB
-    movlw   0x32
-    movwf   PORTB
-    return
-
-TestWrite3DataNack:
-    call    I2cStop
-    BANKSEL PORTB
-    movlw   0x33
-    movwf   PORTB
-    return
-
-;------------------------------------------------------------------------------
-; Multiple Byte Read Test
-; START -> 0xA1 -> READ BYTE -> ACK -> READ BYTE -> ACK -> READ BYTE -> NACK -> STOP
-; On success, last received byte is copied to PORTB.
-;------------------------------------------------------------------------------
-
-TestRead3:
-    BANKSEL PORTB
-    clrf    PORTB
-
-    call    I2cStart
-
-    movlw   SLAVE_ADDR_READ
-    call    I2cSendByte
-
-    BANKSEL SSPCON2
-    btfsc   ACKSTAT
-    goto    TestRead3AddrNack
-
-    ; byte 0
-    call    I2cReceiveByte
-    BANKSEL readByte0
-    movwf   readByte0
-    call    I2cMasterAck
-
-    ; byte 1
-    call    I2cReceiveByte
-    BANKSEL readByte1
-    movwf   readByte1
-    call    I2cMasterAck
-
-    ; byte 2
-    call    I2cReceiveByte
-    BANKSEL readByte2
-    movwf   readByte2
-    call    I2cMasterNack
-
-    call    I2cStop
-
-    ; for now display the last byte
-    BANKSEL readByte2
-    movf    readByte2, w
-    BANKSEL PORTB
-    movwf   PORTB
-    return
-
-TestRead3AddrNack:
-    call    I2cStop
-    BANKSEL PORTB
-    movlw   0x41
     movwf   PORTB
     return
 
@@ -460,27 +344,19 @@ I2cMasterNack:
 I2cMasterNackWait:
     btfsc   ACKEN
     goto    I2cMasterNackWait
+
     return
 
-I2cMasterAck:
-    BANKSEL SSPCON2
-    bcf     ACKDT
-    bsf     ACKEN
-
-I2cMasterAckWait:
-    btfsc   ACKEN
-    goto    I2cMasterAckWait
-    return
 ;------------------------------------------------------------------------------
 ; Delay for visible LED/display status on PORTB
 ;------------------------------------------------------------------------------
 VisibleDelay:
     BANKSEL outerDelay
-    movlw   0x0A
+    movlw   0x05
     movwf   outerDelay
 
 VisibleDelayOuter:
-    movlw   0x0A
+    movlw   0x05
     movwf   innerDelay
 
 VisibleDelayInner:
