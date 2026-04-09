@@ -136,7 +136,7 @@ Setup:
 
     BANKSEL PIR1
     bcf     SSPIF               ; Clear MSSP interrupt flag
-;TODO Deifine Address above and maybe shift it here
+;TODO Define Address above and maybe shift it here
     ; specific 7-bit slave address = 0x50
     BANKSEL SSPADD              ; bit 7 = 1, respond to general call address 0x00
     movlw   0xA0                ; bus byte = 0xA0 or 10100000B for slave address 0x50 in SSPADD<7:1>
