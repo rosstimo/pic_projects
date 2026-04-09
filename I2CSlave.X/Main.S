@@ -34,6 +34,8 @@ CONFIG "WRT = OFF"
 ;--------------------------------------
 ; User constants and variables
 ;--------------------------------------
+
+I2C_SLAVE_ADDRESS   EQU 0x50          ; example 7-bit slave address. will be shifted left by 1 bit when implemented in SSPADD<7:1>
 ;-----------------------------------------------------
 ; I2C flag bits for i2c_flags
 ;-----------------------------------------------------
@@ -72,9 +74,19 @@ i2c_status_snapshot:
     DS 1
 i2c_last_address_byte:
     DS 1
-i2c_rx_byte:
+i2c_byte_index:
     DS 1
-i2c_tx_byte:
+i2c_rx_byte_0:
+    DS 1
+i2c_rx_byte_1:
+    DS 1
+i2c_rx_byte_2:
+    DS 1
+i2c_tx_byte_0:
+    DS 1
+i2c_tx_byte_1:
+    DS 1
+i2c_tx_byte_2:
     DS 1
 i2c_dummy:
     DS 1
@@ -113,11 +125,22 @@ Setup:
     clrf    TRISB
 
 ;----------------------------------
+; I2C slave testing setup
+; not needed for production code.
+;----------------------------------
+    BANKSEL i2c_tx_byte_0
+    movlw   0x11
+    movwf   i2c_tx_byte_0
+    movlw   0x22
+    movwf   i2c_tx_byte_1
+    movlw   0x33
+    movwf   i2c_tx_byte_2
+
+    clrf    i2c_byte_index
+;----------------------------------
 ; I2C slave setup
 ;----------------------------------
-    BANKSEL i2c_tx_byte
-    movlw   0x0f
-    movwf    i2c_tx_byte
+
     ; I2C pins must be inputs
     BANKSEL TRISC
     bsf     TRISC, 3            ; RC3 = SCL
@@ -136,11 +159,14 @@ Setup:
 
     BANKSEL PIR1
     bcf     SSPIF               ; Clear MSSP interrupt flag
-;TODO Define Address above and maybe shift it here
-    ; specific 7-bit slave address = 0x50
+
+    ; set slave address in SSPADD<7:1> register. Bit 0 is not used for address.
+    BANKSEL i2c_dummy
+    movlw   I2C_SLAVE_ADDRESS
+    movwf   i2c_dummy           ; move 7-bit slave address to temporary register
+    rlf     i2c_dummy, w        ; shift left by 1 bit because SSPADD<7:1> holds the 7-bit slave address.
     BANKSEL SSPADD              ; bit 7 = 1, respond to general call address 0x00
-    movlw   0xA0                ; bus byte = 0xA0 or 10100000B for slave address 0x50 in SSPADD<7:1>
-    movwf   SSPADD
+    movwf   SSPADD              ; Set slave address in SSPADD register. Bit 0 is not used for address.
 
     ; Set SSPCON2 Slave options
     BANKSEL SSPCON2
@@ -300,15 +326,21 @@ CheckReadWrite:
 ReadRequestFromMaster:
     BANKSEL i2c_flags
     bsf     i2c_flags, I2CF_R_W             ; set R/W flag to indicate read request from master
-    BANKSEL i2c_tx_byte
-    movf    i2c_tx_byte, w                  ; first byte to send
+    BANKSEL i2c_byte_index
+    clrf    i2c_byte_index                  ; reset byte index for tracking multi-byte reads from master  
+    BANKSEL i2c_tx_byte_0
+    movf    i2c_tx_byte_0, w                ; first byte to send
     BANKSEL SSPBUF
     movwf   SSPBUF                          ; queue first transmit byte now
+    BANKSEL i2c_byte_index
+    incf    i2c_byte_index, f               ; next transmit will be byte 1
     goto    LeaveI2cSlave                   ; for now we just set the flag and leave.
 
 WriteRequestFromMaster:
     BANKSEL i2c_flags
     bcf     i2c_flags, I2CF_R_W             ; clear R/W flag to indicate write request from master 
+    BANKSEL i2c_byte_index
+    clrf    i2c_byte_index                  ; reset byte index for tracking multi-byte writes from master
     goto    LeaveI2cSlave                   ; for now we just clear the flag and leave.
 
 IsDataByte:
@@ -319,20 +351,84 @@ IsDataByte:
     goto    DataWriteToSlave                ; master is writing data to slave
 
 DataReadFromSlave:
-    BANKSEL i2c_tx_byte
-    movf    i2c_tx_byte, w                  ; next byte to send
+    BANKSEL i2c_byte_index
+    movf    i2c_byte_index, w
+    xorlw   1
+    btfsc   ZERO
+    goto    SendTx1
+
+    movf    i2c_byte_index, w
+    xorlw   2
+    btfsc   ZERO
+    goto    SendTx2
+
+    ; default: repeat last byte if master keeps reading
+    BANKSEL i2c_tx_byte_2
+    movf    i2c_tx_byte_2, w
+    goto    QueueTxByte
+
+SendTx1:
+    BANKSEL i2c_tx_byte_1
+    movf    i2c_tx_byte_1, w
+    goto    QueueTxByte
+
+SendTx2:
+    BANKSEL i2c_tx_byte_2
+    movf    i2c_tx_byte_2, w
+
+QueueTxByte:
     BANKSEL SSPBUF
-    movwf   SSPBUF                          ; queue next byte
-    goto    LeaveI2cSlave                   ; for now we just load the data byte and set the flag, then leave.
+    movwf   SSPBUF
+
+    BANKSEL i2c_byte_index
+    incf    i2c_byte_index, f
+
+    goto    LeaveI2cSlave
 
 DataWriteToSlave:
     BANKSEL SSPBUF
-    movf    SSPBUF, w                       ; read data byte to clear BF bit and get data
-    BANKSEL i2c_rx_byte         
-    movwf   i2c_rx_byte                     ; save received data byte for main loop to process
-    BANKSEL i2c_flags
-    bcf     i2c_flags, I2CF_R_W             ; clear R/W
-    goto    LeaveI2cSlave                   ; for now we just read the data byte and leave.
+    movf    SSPBUF, w                  ; read once only
+
+    BANKSEL i2c_dummy
+    movwf   i2c_dummy                  ; temporary holding register
+
+    BANKSEL i2c_byte_index
+    movf    i2c_byte_index, w
+    xorlw   0
+    btfsc   ZERO
+    goto    StoreRx0
+
+    movf    i2c_byte_index, w
+    xorlw   1
+    btfsc   ZERO
+    goto    StoreRx1
+
+    goto    StoreRx2
+
+StoreRx0:
+    BANKSEL i2c_dummy
+    movf    i2c_dummy, w
+    BANKSEL i2c_rx_byte_0
+    movwf   i2c_rx_byte_0
+    goto    BumpRxIndex
+
+StoreRx1:
+    BANKSEL i2c_dummy
+    movf    i2c_dummy, w
+    BANKSEL i2c_rx_byte_1
+    movwf   i2c_rx_byte_1
+    goto    BumpRxIndex
+
+StoreRx2:
+    BANKSEL i2c_dummy
+    movf    i2c_dummy, w
+    BANKSEL i2c_rx_byte_2
+    movwf   i2c_rx_byte_2
+
+BumpRxIndex:
+    BANKSEL i2c_byte_index
+    incf    i2c_byte_index, f
+    goto    LeaveI2cSlave
 
 ResetBus:
     BANKSEL SSPCON
