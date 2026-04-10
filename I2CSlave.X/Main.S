@@ -258,9 +258,9 @@ LeaveIsr:
 
 ;--------------------------------------
 ; I2C Slave ISR
-; Input:  i2c_flags, i2c_tx_byte
-; Output: i2c_flags, i2c_rx_byte
-; Uses:   i2c_flags, i2c_status_snapshot, i2c_last_address_byte, i2c_rx_byte, i2c_tx_byte
+; Input:  i2c_tx_byte_0, i2c_tx_byte_1, i2c_tx_byte_2
+; Output: i2c_flags, i2c_rx_byte_0, i2c_rx_byte_1, i2c_rx_byte_2
+; Uses:   i2c_flags, i2c_status_snapshot, i2c_last_address_byte, i2c_byte_index, i2c_dummy
 ; Stack Depth: 1
 ;--------------------------------------
 ServiceI2cSlave:
@@ -349,12 +349,10 @@ DataReadFromSlave:
     xorlw   1                               ; check if byte index is 1
     btfsc   ZERO
     goto    SendTx1
-
     movf    i2c_byte_index, w
     xorlw   2                               ; check if byte index is 2 
     btfsc   ZERO
     goto    SendTx2
-
     BANKSEL i2c_tx_byte_2
     movf    i2c_tx_byte_2, w                ; default: repeat last byte if master keeps reading
     goto    QueueTxByte
@@ -378,16 +376,13 @@ QueueTxByte:
 DataWriteToSlave:
     BANKSEL SSPBUF
     movf    SSPBUF, w                       ; read once only
-
     BANKSEL i2c_dummy
     movwf   i2c_dummy                       ; temporary holding register
-
     BANKSEL i2c_byte_index
     movf    i2c_byte_index, w               ; check byte index to determine where to store received byte from master
     xorlw   0                               ; check if byte index is 0
     btfsc   ZERO
     goto    StoreRx0
-
     movf    i2c_byte_index, w
     xorlw   1                               ; check if byte index is 1
     btfsc   ZERO
