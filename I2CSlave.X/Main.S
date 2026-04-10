@@ -36,12 +36,10 @@ CONFIG "WRT = OFF"
 ;--------------------------------------
 
 I2C_SLAVE_ADDRESS   EQU 0x50          ; example 7-bit slave address. will be shifted left by 1 bit when implemented in SSPADD<7:1>
+
 ;-----------------------------------------------------
 ; I2C flag bits for i2c_flags
 ;-----------------------------------------------------
-I2CF_D0             EQU 0            ; count consecutive data bytes received or transmitted, can be used for tracking position in a multi-byte transfer
-I2CF_D1             EQU 1            ; count consecutive data bytes received or transmitted, can be used for tracking position in a multi-byte transfer
-I2CF_D2             EQU 2            ; count consecutive data bytes received or transmitted, can be used for tracking position in a multi-byte transfer
 I2CF_D_A            EQU 3            ; data/address bit
 I2CF_R_W            EQU 4            ; read/write bit
 I2CF_GENERAL_CALL   EQU 5            ; general call bit
@@ -51,8 +49,8 @@ I2CF_COLLISION      EQU 7            ; collision bit
 ;-----------------------------------------------------
 ; I2C SSPSTAT bits in i2c_status_snapshot
 ;-----------------------------------------------------
-STAT_R_W         EQU 2               ;descriptive name for read/write bit
-STAT_D_A         EQU 5               ;descriptive name for data/address bit
+STAT_R_W            EQU 2            ;descriptive name for read/write bit
+STAT_D_A            EQU 5            ;descriptive name for data/address bit
 ;-----------------------------------------------------
 ; Shared / common RAM 0x70 to 0x7F. All Banks can access.
 ;-----------------------------------------------------
@@ -129,11 +127,11 @@ Setup:
 ; not needed for production code.
 ;----------------------------------
     BANKSEL i2c_tx_byte_0
-    movlw   0x11
+    movlw   0x55
     movwf   i2c_tx_byte_0
-    movlw   0x22
+    movlw   0xAA
     movwf   i2c_tx_byte_1
-    movlw   0x33
+    movlw   0xF0
     movwf   i2c_tx_byte_2
 
     clrf    i2c_byte_index
@@ -201,11 +199,6 @@ Setup:
 ;------------------------------------------------------------------------------
 MainLoop:
     ; add main loop code here
-    ; move isc_flags to PORTB for debug output
-    BANKSEL i2c_flags
-    movf    i2c_flags, w
-    BANKSEL PORTB
-    movwf   PORTB
     goto MainLoop
 
 ;------------------------------------------------------------------------------
@@ -351,20 +344,19 @@ IsDataByte:
     goto    DataWriteToSlave                ; master is writing data to slave
 
 DataReadFromSlave:
-    BANKSEL i2c_byte_index
-    movf    i2c_byte_index, w
-    xorlw   1
+    BANKSEL i2c_byte_index                  
+    movf    i2c_byte_index, w               ; check byte index to determine which byte to send
+    xorlw   1                               ; check if byte index is 1
     btfsc   ZERO
     goto    SendTx1
 
     movf    i2c_byte_index, w
-    xorlw   2
+    xorlw   2                               ; check if byte index is 2 
     btfsc   ZERO
     goto    SendTx2
 
-    ; default: repeat last byte if master keeps reading
     BANKSEL i2c_tx_byte_2
-    movf    i2c_tx_byte_2, w
+    movf    i2c_tx_byte_2, w                ; default: repeat last byte if master keeps reading
     goto    QueueTxByte
 
 SendTx1:
@@ -378,32 +370,29 @@ SendTx2:
 
 QueueTxByte:
     BANKSEL SSPBUF
-    movwf   SSPBUF
-
+    movwf   SSPBUF                          ; queue byte to SSPBUF to be sent to master
     BANKSEL i2c_byte_index
-    incf    i2c_byte_index, f
-
+    incf    i2c_byte_index, f               ; increment byte index for next potential byte to send
     goto    LeaveI2cSlave
 
 DataWriteToSlave:
     BANKSEL SSPBUF
-    movf    SSPBUF, w                  ; read once only
+    movf    SSPBUF, w                       ; read once only
 
     BANKSEL i2c_dummy
-    movwf   i2c_dummy                  ; temporary holding register
+    movwf   i2c_dummy                       ; temporary holding register
 
     BANKSEL i2c_byte_index
-    movf    i2c_byte_index, w
-    xorlw   0
+    movf    i2c_byte_index, w               ; check byte index to determine where to store received byte from master
+    xorlw   0                               ; check if byte index is 0
     btfsc   ZERO
     goto    StoreRx0
 
     movf    i2c_byte_index, w
-    xorlw   1
+    xorlw   1                               ; check if byte index is 1
     btfsc   ZERO
     goto    StoreRx1
-
-    goto    StoreRx2
+    goto    StoreRx2                        ; default: if byte index is 2 or greater, just store in rx_byte_2 and overwrite previous value. No bounds checking in this example.
 
 StoreRx0:
     BANKSEL i2c_dummy
@@ -417,7 +406,7 @@ StoreRx1:
     movf    i2c_dummy, w
     BANKSEL i2c_rx_byte_1
     movwf   i2c_rx_byte_1
-    goto    BumpRxIndex
+    goto    BumpRxIndex                     
 
 StoreRx2:
     BANKSEL i2c_dummy
@@ -427,7 +416,7 @@ StoreRx2:
 
 BumpRxIndex:
     BANKSEL i2c_byte_index
-    incf    i2c_byte_index, f
+    incf    i2c_byte_index, f               ; increment byte index for next potential byte to receive from master
     goto    LeaveI2cSlave
 
 ResetBus:
