@@ -1,174 +1,307 @@
-(kicad_sch (version 20230121) (generator openai_rcet)
-
-  (uuid 49122f3a-e33d-44f0-9255-b46f34ecb458)
-
-  (paper "A4")
-
-  (title_block
-    (title "PICkit 3 to PIC16F883 ICSP / Reset")
-    (date "2026-09-11")
-    (rev "1")
-    (company "Idaho State University - RCET")
-    (comment 1 "PIC16F883 28-pin PDIP programming reference")
-    (comment 2 "High-voltage ICSP course default; LVP disabled")
-  )
-
-  (lib_symbols)
-
-  (wire
-    (pts (xy 55 65) (xy 155 65))
-    (stroke (width 0) (type default))
-    (uuid 0f40b796-8706-4c2c-8700-7b63df5ead8d)
-  )
-  (wire
-    (pts (xy 55 75) (xy 155 75))
-    (stroke (width 0) (type default))
-    (uuid 20e2bdcf-3637-4e65-819b-34d1eddd4fc6)
-  )
-  (wire
-    (pts (xy 55 85) (xy 155 85))
-    (stroke (width 0) (type default))
-    (uuid c7cd06da-1303-426c-87f1-78d7962d7e9f)
-  )
-  (wire
-    (pts (xy 55 95) (xy 155 95))
-    (stroke (width 0) (type default))
-    (uuid d185eb79-52d1-49d6-8231-f7e4702e7727)
-  )
-  (wire
-    (pts (xy 55 105) (xy 155 105))
-    (stroke (width 0) (type default))
-    (uuid 06ee2450-b54e-4d65-8282-ac4be4338c7e)
-  )
-
-
-
-  (label "MCLR_VPP"
-    (at 105 65 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid c9f7ad13-eac6-4ad7-838e-180e31bb983e)
-  )
-  (label "VDD_TARGET"
-    (at 105 75 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid 11a0fc33-50d8-4900-97ca-4c72d6ce3dfb)
-  )
-  (label "VSS"
-    (at 105 85 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid 5feb8c36-9466-4202-88a1-8036958811c3)
-  )
-  (label "ICSPDAT_PGD"
-    (at 105 95 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid ccd1abcc-8fba-4a7d-90c3-6f0002f2cb32)
-  )
-  (label "ICSPCLK_PGC"
-    (at 105 105 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid 3cf1debd-262e-48c5-ac98-416f4f593546)
-  )
-
-  (text "PICkit 3"
-    (at 42 45 0)
-    (effects (font (size 2.54 2.54)))
-    (uuid ad3d193a-f8c2-451b-8438-98882e429d09)
-  )
-  (text "PIC16F883 (28-pin PDIP)"
-    (at 145 45 0)
-    (effects (font (size 2.54 2.54)))
-    (uuid bfb62fc0-28c9-4786-aa6c-95ee348c0f97)
-  )
-
-  (text "pin 1  VPP / MCLR"
-    (at 45 63 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid d0178d93-fb93-4fe9-a471-1fb8156c2ae8)
-  )
-  (text "pin 2  VDD Target"
-    (at 45 73 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid 9ec31fde-1f45-4c6c-8986-a076ee073ec1)
-  )
-  (text "pin 3  VSS"
-    (at 45 83 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid 3b98b53c-5530-46d0-9135-6be49e14a725)
-  )
-  (text "pin 4  ICSPDAT / PGD"
-    (at 45 93 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid 7947ae77-33b0-49d6-a132-d18ee17951ee)
-  )
-  (text "pin 5  ICSPCLK / PGC"
-    (at 45 103 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid dc8d3320-fce4-4f5d-95ce-1c69a74da86e)
-  )
-  (text "pin 6  LVP: not connected for RCET high-voltage ICSP default"
-    (at 45 115 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid c72093cb-ca97-45ff-aefb-07aee885f09f)
-  )
-
-  (text "pin 1  RE3 / MCLR / VPP"
-    (at 158 63 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid 06792e59-e012-4763-a774-af0075ce9638)
-  )
-  (text "pin 20  VDD"
-    (at 158 73 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid 86e35bf0-f06a-48d5-b87c-c90daf204949)
-  )
-  (text "pins 8 and 19  VSS"
-    (at 158 83 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid 19cde58d-5df1-42db-982a-a41a7237a5c5)
-  )
-  (text "pin 28  RB7 / ICSPDAT"
-    (at 158 93 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid 9dd2524b-1764-444c-be00-fcc1b203c1e9)
-  )
-  (text "pin 27  RB6 / ICSPCLK"
-    (at 158 103 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid b77a8434-d4c8-4fe5-88f0-d846c6622637)
-  )
-  (text "optional LVP: pin 24 RB3 / PGM"
-    (at 158 115 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid 6dbf045b-3c2b-476e-90a7-166723201c4d)
-  )
-
-  (text "10 kΩ MCLR pull-up to target VDD"
-    (at 108 50 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid 57f967c0-f2d8-4b27-b7bd-63ddba2f1a95)
-  )
-  (text "Do not place a capacitor directly on MCLR for PICkit 3 programming/debug."
-    (at 55 130 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid 735a35e5-302c-4097-94cc-e27712cce1c9)
-  )
-  (text "Keep PGC/PGD free of pull-ups, capacitors, diodes, or other loading that disturbs ICSP signaling."
-    (at 55 136 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid ec14f01b-b14d-4a55-a9e5-f13ee5cbf924)
-  )
-  (text "External target power is preferred; PICkit pin 2 still senses target VDD."
-    (at 55 142 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid 2900d6de-ed36-4fb9-a25e-c3cb5a90ef05)
-  )
-  (text "Sources: Microchip DS51795A, DS41287A, and PIC16F883/884/886/887 data sheet."
-    (at 55 154 0)
-    (effects (font (size 1.27 1.27)))
-    (uuid e91e36e3-16bd-4d87-a4f8-0ab430947d39)
-  )
-
-  (sheet_instances
-    (path "/" (page "1"))
-  )
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "49122f3a-e33d-44f0-9255-b46f34ecb458")
+	(paper "A4")
+	(title_block
+		(title "PICkit 3 to PIC16F883 ICSP / Reset")
+		(date "2026-09-11")
+		(rev "1")
+		(company "Idaho State University - RCET")
+		(comment 1 "PIC16F883 28-pin PDIP programming reference")
+		(comment 2 "High-voltage ICSP course default; LVP disabled")
+	)
+	(lib_symbols)
+	(text "pin 1  RE3 / MCLR / VPP"
+		(exclude_from_sim no)
+		(at 158 63 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "06792e59-e012-4763-a774-af0075ce9638")
+	)
+	(text "pins 8 and 19  VSS"
+		(exclude_from_sim no)
+		(at 158 83 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "19cde58d-5df1-42db-982a-a41a7237a5c5")
+	)
+	(text "External target power is preferred; PICkit pin 2 still senses target VDD."
+		(exclude_from_sim no)
+		(at 55 142 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "2900d6de-ed36-4fb9-a25e-c3cb5a90ef05")
+	)
+	(text "pin 3  VSS"
+		(exclude_from_sim no)
+		(at 45 83 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "3b98b53c-5530-46d0-9135-6be49e14a725")
+	)
+	(text "10 kΩ MCLR pull-up to target VDD"
+		(exclude_from_sim no)
+		(at 108 50 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "57f967c0-f2d8-4b27-b7bd-63ddba2f1a95")
+	)
+	(text "optional LVP: pin 24 RB3 / PGM"
+		(exclude_from_sim no)
+		(at 158 115 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "6dbf045b-3c2b-476e-90a7-166723201c4d")
+	)
+	(text "Do not place a capacitor directly on MCLR for PICkit 3 programming/debug."
+		(exclude_from_sim no)
+		(at 55 130 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "735a35e5-302c-4097-94cc-e27712cce1c9")
+	)
+	(text "pin 4  ICSPDAT / PGD"
+		(exclude_from_sim no)
+		(at 45 93 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "7947ae77-33b0-49d6-a132-d18ee17951ee")
+	)
+	(text "pin 20  VDD"
+		(exclude_from_sim no)
+		(at 158 73 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "86e35bf0-f06a-48d5-b87c-c90daf204949")
+	)
+	(text "pin 28  RB7 / ICSPDAT"
+		(exclude_from_sim no)
+		(at 158 93 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "9dd2524b-1764-444c-be00-fcc1b203c1e9")
+	)
+	(text "pin 2  VDD Target"
+		(exclude_from_sim no)
+		(at 45 73 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "9ec31fde-1f45-4c6c-8986-a076ee073ec1")
+	)
+	(text "PICkit 3"
+		(exclude_from_sim no)
+		(at 42 45 0)
+		(effects
+			(font
+				(size 2.54 2.54)
+			)
+		)
+		(uuid "ad3d193a-f8c2-451b-8438-98882e429d09")
+	)
+	(text "pin 27  RB6 / ICSPCLK"
+		(exclude_from_sim no)
+		(at 158 103 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "b77a8434-d4c8-4fe5-88f0-d846c6622637")
+	)
+	(text "PIC16F883 (28-pin PDIP)"
+		(exclude_from_sim no)
+		(at 145 45 0)
+		(effects
+			(font
+				(size 2.54 2.54)
+			)
+		)
+		(uuid "bfb62fc0-28c9-4786-aa6c-95ee348c0f97")
+	)
+	(text "pin 6  LVP: not connected for RCET high-voltage ICSP default"
+		(exclude_from_sim no)
+		(at 45 115 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "c72093cb-ca97-45ff-aefb-07aee885f09f")
+	)
+	(text "pin 1  VPP / MCLR"
+		(exclude_from_sim no)
+		(at 45 63 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "d0178d93-fb93-4fe9-a471-1fb8156c2ae8")
+	)
+	(text "pin 5  ICSPCLK / PGC"
+		(exclude_from_sim no)
+		(at 45 103 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "dc8d3320-fce4-4f5d-95ce-1c69a74da86e")
+	)
+	(text "Sources: Microchip DS51795A, DS41287A, and PIC16F883/884/886/887 data sheet."
+		(exclude_from_sim no)
+		(at 55 154 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "e91e36e3-16bd-4d87-a4f8-0ab430947d39")
+	)
+	(text "Keep PGC/PGD free of pull-ups, capacitors, diodes, or other loading that disturbs ICSP signaling."
+		(exclude_from_sim no)
+		(at 55 136 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "ec14f01b-b14d-4a55-a9e5-f13ee5cbf924")
+	)
+	(wire
+		(pts
+			(xy 55 105) (xy 155 105)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "06ee2450-b54e-4d65-8282-ac4be4338c7e")
+	)
+	(wire
+		(pts
+			(xy 55 65) (xy 155 65)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0f40b796-8706-4c2c-8700-7b63df5ead8d")
+	)
+	(wire
+		(pts
+			(xy 55 75) (xy 155 75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "20e2bdcf-3637-4e65-819b-34d1eddd4fc6")
+	)
+	(wire
+		(pts
+			(xy 55 85) (xy 155 85)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c7cd06da-1303-426c-87f1-78d7962d7e9f")
+	)
+	(wire
+		(pts
+			(xy 55 95) (xy 155 95)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d185eb79-52d1-49d6-8231-f7e4702e7727")
+	)
+	(label "VDD_TARGET"
+		(at 105 75 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "11a0fc33-50d8-4900-97ca-4c72d6ce3dfb")
+	)
+	(label "ICSPCLK_PGC"
+		(at 105 105 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "3cf1debd-262e-48c5-ac98-416f4f593546")
+	)
+	(label "VSS"
+		(at 105 85 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "5feb8c36-9466-4202-88a1-8036958811c3")
+	)
+	(label "MCLR_VPP"
+		(at 105 65 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "c9f7ad13-eac6-4ad7-838e-180e31bb983e")
+	)
+	(label "ICSPDAT_PGD"
+		(at 105 95 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "ccd1abcc-8fba-4a7d-90c3-6f0002f2cb32")
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
 )
