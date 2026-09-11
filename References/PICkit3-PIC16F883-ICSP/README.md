@@ -31,10 +31,11 @@ If those pins are also used by the application, verify that the attached circuit
 
 The PICkit 3 guide recommends externally powered target hardware for general use. PICkit pin 2 still connects to target VDD so the programmer can sense the target level. Connect both PIC16F883 VSS pins to ground.
 
-## Schematic files
+## Schematic file and review artifact
 
-- `PICkit3-PIC16F883-ICSP.sch` — editable KiCad legacy schematic source. Current KiCad releases can open the legacy schematic and save it in the modern `.kicad_sch` format.
-- CI renders the schematic to PDF when the branch workflow is available, so the drawing can be reviewed without opening KiCad.
+- `PICkit3-PIC16F883-ICSP.kicad_sch` is the canonical editable KiCad schematic source.
+- GitHub Actions opens that exact source with `kicad-cli` and renders a PDF plus contact-sheet preview.
+- Treat a green render workflow as machine verification that the checked-in source is a valid KiCad schematic. Human review still confirms that the drawing is legible and communicates the intended bench wiring clearly.
 
 ## Authoritative sources
 
