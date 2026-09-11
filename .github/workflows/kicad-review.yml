@@ -29,7 +29,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          src="References/PICkit3-PIC16F883-ICSP/PICkit3-PIC16F883-ICSP.sch"
+          src="References/PICkit3-PIC16F883-ICSP/PICkit3-PIC16F883-ICSP.kicad_sch"
           root="review-artifacts/kicad/PICkit3-PIC16F883-ICSP"
           mkdir -p "$root/pages"
 
