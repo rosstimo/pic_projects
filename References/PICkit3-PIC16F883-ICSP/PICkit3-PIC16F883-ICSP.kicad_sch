@@ -41,11 +41,7 @@
     (uuid 06ee2450-b54e-4d65-8282-ac4be4338c7e)
   )
 
-  (wire
-    (pts (xy 105 65) (xy 105 55) (xy 125 55) (xy 125 75))
-    (stroke (width 0) (type default))
-    (uuid 90348a98-020e-401c-ae30-aa4bbbecc909)
-  )
+
 
   (label "MCLR_VPP"
     (at 105 65 0)
