@@ -620,6 +620,19 @@ Reason:
 - `BANKSEL` may expand to more than one instruction,
 - skip instructions can break the intended sequence.
 
+### 10.4 Timing-Critical `BANKSEL` Rule
+
+Do not assign a fixed cycle cost to the source line `BANKSEL` by inspection alone. `BANKSEL` is an assembler directive that emits the bank-selection instruction sequence required for the selected device/register context.
+
+If a `BANKSEL` lies on a timing-critical path:
+
+1. build the actual project with the actual device/toolchain settings;
+2. inspect the generated listing/disassembly or Program Memory;
+3. count the instructions that were actually emitted on that path;
+4. use those emitted instructions in the timing calculation.
+
+The same rule applies when a skip instruction can change which emitted instructions execute. Source-line count is not machine-cycle count.
+
 ---
 
 ## 11. PSECT Rules
@@ -852,6 +865,7 @@ Before submitting a PIC-AS assignment, verify the following.
 
 - [ ] bank selection is explicit where needed
 - [ ] no `BANKSEL` placed immediately after skip instructions
+- [ ] timing-critical `BANKSEL` code is counted from emitted instructions, not assumed from source lines
 - [ ] literals use a consistent style
 - [ ] hex values are clearly written
 - [ ] code matches schematic and lab behavior
