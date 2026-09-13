@@ -4,6 +4,7 @@ This repository is the shared RCET home for PIC16F883 assembly examples and tech
 
 ## Start here
 
+- [`References/Microchip-Documentation-Guide.md`](References/Microchip-Documentation-Guide.md) - categorized student/instructor index of relevant official Microchip data sheets, errata, family manuals, toolchain guides, application notes, technical briefs, Tips 'N Tricks, and other supplemental documentation.
 - [`Template_Main.S`](Template_Main.S) - canonical PIC16F883 PIC Assembler starter source.
 - [`RCET_PIC-AS_Style_Guide.md`](RCET_PIC-AS_Style_Guide.md) - required RCET PIC-AS formatting, naming, banking, PSECT, subroutine, and ISR conventions.
 - [`References/MPLAB-PICkit3-Setup.md`](References/MPLAB-PICkit3-Setup.md) - supported MPLAB X/PICkit 3 version path and first-project setup.
@@ -26,6 +27,8 @@ After building, verify the linked result in MPLAB X Program Memory rather than a
 
 ## Authority
 
-For PIC16F883 device behavior, the PIC16F882/883/884/886/887 data sheet is the primary authority. Use the PICmicro Mid-Range MCU Family Reference Manual for architecture and broader family explanations, and the MPLAB XC8 PIC Assembler documentation for assembler/linker behavior.
+For PIC16F883 device behavior, use the current PIC16F882/883/884/886/887 data sheet together with the current silicon errata. Use the PICmicro Mid-Range MCU Family Reference Manual for architecture and broader family explanations, and the MPLAB XC8 PIC Assembler documentation for assembler/linker behavior.
+
+The canonical external-document index is [`References/Microchip-Documentation-Guide.md`](References/Microchip-Documentation-Guide.md). Add useful official Microchip sources there as they are discovered rather than creating separate document lists in individual courses.
 
 Course examples are references, not replacements for those documents.
