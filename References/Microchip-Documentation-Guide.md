@@ -6,6 +6,22 @@ This is the shared RCET index to official Microchip documentation relevant to th
 
 Use this page to find the right source quickly. It is not a replacement for the source documents.
 
+## Finding documents not yet listed here
+
+Use Microchip's central **Document Listing** page when you need an official document that has not yet been added to this guide:
+
+**URL:** https://www.microchip.com/en-us/document-listing
+
+You can search by document title, keywords, product, or document number, then narrow the results by document category.
+
+For example, search for:
+
+`40001291H`
+
+This is the document number for the **PIC16F882/883/884/886/887 Data Sheet**. You may also see Microchip document numbers written with an `DS` prefix, such as `DS40001291H`. If a document-number search does not return what you expect, search by product or title instead, for example `PIC16F883`.
+
+This lookup page is the preferred starting point for finding additional official Microchip documents that are not yet captured below. When a useful document is found, add it to this guide so the next student or instructor does not have to rediscover it.
+
 ## How to use this guide
 
 Documents are labeled by how directly they apply to the PIC16F883:
