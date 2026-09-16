@@ -1,0 +1,65 @@
+name: Build KiCad Review Artifact
+
+on:
+  pull_request:
+    paths:
+      - "References/PICkit3-PIC16F883-ICSP/**"
+      - ".github/workflows/kicad-review.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "References/PICkit3-PIC16F883-ICSP/**"
+      - ".github/workflows/kicad-review.yml"
+  workflow_dispatch:
+
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install current KiCad 10 stable and PDF tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common poppler-utils imagemagick
+          sudo add-apt-repository --yes ppa:kicad/kicad-10.0-releases
+          sudo apt-get update
+          sudo apt-get install -y --install-recommends kicad
+
+      - name: Render schematic review bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          src="References/PICkit3-PIC16F883-ICSP/PICkit3-PIC16F883-ICSP.kicad_sch"
+          root="review-artifacts/kicad/PICkit3-PIC16F883-ICSP"
+          mkdir -p "$root/pages"
+
+          kicad-cli version | tee "$root/kicad-version.txt"
+          kicad-cli sch export pdf --output "$root/PICkit3-PIC16F883-ICSP.pdf" "$src" 2>&1 | tee "$root/build.log"
+
+          pdftoppm -png -r 140 "$root/PICkit3-PIC16F883-ICSP.pdf" "$root/pages/page"
+          shopt -s nullglob
+          pages=("$root/pages"/*.png)
+          if [ ${#pages[@]} -gt 0 ]; then
+            montage "${pages[@]}" -thumbnail '1000x' -tile 2x -geometry +12+12 "$root/contact-sheet.png" || true
+          fi
+
+          cat > "$root/manifest.md" <<EOF
+          # PICkit 3 ↔ PIC16F883 schematic review
+
+          - source: \`$src\`
+          - PDF: \`PICkit3-PIC16F883-ICSP.pdf\`
+          - contact sheet: \`contact-sheet.png\`
+          - KiCad version: see \`kicad-version.txt\`
+          EOF
+
+      - name: Upload schematic review bundle
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: pic-projects-pickit3-pic16f883-kicad-${{ github.sha }}
+          path: review-artifacts/kicad
+          if-no-files-found: warn
+          retention-days: 30
