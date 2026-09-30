@@ -59,8 +59,6 @@ w_temp:
     DS 1
 status_temp:
     DS 1
-pclath_temp:
-    DS 1
 
 ;-----------------------------------------------------
 ; Banked RAM used by this module
@@ -229,23 +227,18 @@ ResetI2c:
 ; IsrHandler
 ; Input:  none
 ; Output: none
-; Uses:   w_temp, status_temp, pclath_temp
 ; These registers are in common ram so no bank switching is needed.
 ;------------------------------------------------------------------------------
 IsrHandler:
     movwf   w_temp          ; save WREG
     swapf   STATUS,w        ; read STATUS with swap to avoid affecting status flags
     movwf   status_temp     ; save STATUS
-    movf    PCLATH,w        
-    movwf   pclath_temp     ; save PCLATH
 
     BANKSEL PIR1
     btfsc   SSPIF           ; check if MSSP interrupt
     goto    ServiceI2cSlave
 
 LeaveIsr:
-    movf    pclath_temp,w   
-    movwf   PCLATH          ; restore PCLATH
     swapf   status_temp,w   ; read saved STATUS swapping nibbles back to original
     movwf   STATUS          ; restore STATUS
     swapf   w_temp,f        ; prepare for restoring WREG without affecting flags
