@@ -89,7 +89,7 @@ main:
 
     BANKSEL SPBRG
     movlw   25
-    movwf   BANKMASK(SPBRG)
+    movwf   SPBRG
 
     ; Set up transmitter
     BANKSEL TXSTA
@@ -112,7 +112,7 @@ send_loop:
     movlw   0x55
     ; movlw  0x24               ; same thing, less readable because humans
     BANKSEL TXREG
-    movwf   BANKMASK(TXREG)
+    movwf   TXREG
 
     goto    send_loop
 
