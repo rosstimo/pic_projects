@@ -593,7 +593,7 @@ Typical form:
 
 ```assembly
     BANKSEL TRISB
-    clrf    BANKMASK(TRISB)
+    clrf    TRISB
 ```
 
 ### 10.2 Do Not Hide Banking Assumptions
@@ -780,14 +780,14 @@ PSECT code,class=CODE,delta=2
 
 Setup:
     BANKSEL ANSEL
-    clrf    BANKMASK(ANSEL)
-    clrf    BANKMASK(ANSELH)
+    clrf    ANSEL
+    clrf    ANSELH
 
     BANKSEL TRISB
-    clrf    BANKMASK(TRISB)
+    clrf    TRISB
 
     BANKSEL PORTB
-    clrf    BANKMASK(PORTB)
+    clrf    PORTB
 
     goto    MainLoop
 

@@ -108,7 +108,7 @@ main:
 
     BANKSEL SPBRG
     movlw   25
-    movwf   BANKMASK(SPBRG)
+    movwf   SPBRG
 
     ; -------------------------------
     ; Async receive setup
@@ -135,7 +135,7 @@ rx_loop:
 
     ; Read received byte and show it on PORTB
     BANKSEL RCREG
-    movf    BANKMASK(RCREG), w
+    movf    RCREG, w
 
     BANKSEL PORTB
     movwf   PORTB

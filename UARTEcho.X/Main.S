@@ -111,7 +111,7 @@ Setup:
 
     BANKSEL SPBRG
     MOVLW   25
-    MOVWF   BANKMASK(SPBRG)
+    MOVWF   SPBRG
 
     ; Setup async serial mode
     BANKSEL TXSTA
@@ -150,7 +150,7 @@ Setup:
 
     ; Clear software status flags
     BANKSEL rxStatus
-    CLRF    BANKMASK(rxStatus)
+    CLRF    rxStatus
 
     ; Enable UART receive interrupt only
     BANKSEL PIE1
@@ -169,21 +169,21 @@ Setup:
 MainLoop:
     ; Check for a new received byte
     BANKSEL rxStatus
-    BTFSC   BANKMASK(rxStatus), RX_READY_BIT
+    BTFSC   rxStatus, RX_READY_BIT
     CALL ProcessRxByte
     GOTO MainLoop
 
 ProcessRxByte:
     ; Get the received byte
     BANKSEL rxByte
-    MOVF    BANKMASK(rxByte), W
+    MOVF    rxByte, W
 
     ; Process byte here
     CALL    TxByte        ; Echo byte back
 
     ; Mark the byte as consumed
     BANKSEL rxStatus
-    BCF     BANKMASK(rxStatus), RX_READY_BIT
+    BCF     rxStatus, RX_READY_BIT
     RETURN
 
 ; ------------------------------------------------------------
@@ -194,7 +194,7 @@ ProcessRxByte:
 TxByte:
     ; Save the byte to send
     BANKSEL txByteTemp
-    MOVWF   BANKMASK(txByteTemp)
+    MOVWF   txByteTemp
 
 TxByteWait:
     ; Wait for TXREG to be empty
@@ -204,10 +204,10 @@ TxByteWait:
 
     ; Send the byte
     BANKSEL txByteTemp
-    MOVF    BANKMASK(txByteTemp), w
+    MOVF    txByteTemp, w
 
     BANKSEL TXREG
-    MOVWF   BANKMASK(TXREG)
+    MOVWF   TXREG
 
     RETURN
 
@@ -267,36 +267,36 @@ SerialRx:
 
     ; Mailbox already full?
     BANKSEL rxStatus
-    BTFSC   BANKMASK(rxStatus), RX_READY_BIT
+    BTFSC   rxStatus, RX_READY_BIT
     GOTO    SerialRx_HandleSoftOverflow
 
     ; Read the good byte and store it
     BANKSEL RCREG
-    MOVF    BANKMASK(RCREG), W
+    MOVF    RCREG, W
 
     BANKSEL rxByte
-    MOVWF   BANKMASK(rxByte)
+    MOVWF   rxByte
 
     BANKSEL rxStatus
-    BSF     BANKMASK(rxStatus), RX_READY_BIT
+    BSF     rxStatus, RX_READY_BIT
     GOTO    LeaveISR
 
 SerialRx_HandleSoftOverflow:
     ; Keep old byte, discard new byte
     BANKSEL RCREG
-    MOVF    BANKMASK(RCREG), W
+    MOVF    RCREG, W
 
     BANKSEL rxStatus
-    BSF     BANKMASK(rxStatus), RX_SOFTOVF_BIT
+    BSF     rxStatus, RX_SOFTOVF_BIT
     GOTO LeaveISR
 
 SerialRx_HandleFraming:
     ; Read and discard bad byte
     BANKSEL RCREG
-    MOVF    BANKMASK(RCREG), W
+    MOVF    RCREG, W
 
     BANKSEL rxStatus
-    BSF     BANKMASK(rxStatus), RX_FERR_BIT
+    BSF     rxStatus, RX_FERR_BIT
     GOTO LeaveISR
 
 SerialRx_HandleOverrun:
@@ -306,7 +306,7 @@ SerialRx_HandleOverrun:
     BSF     CREN
 
     BANKSEL rxStatus
-    BSF     BANKMASK(rxStatus), RX_OERR_BIT
+    BSF     rxStatus, RX_OERR_BIT
     GOTO LeaveISR
 
 END ; End of code. This is required

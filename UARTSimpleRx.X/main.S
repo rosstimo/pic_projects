@@ -97,7 +97,7 @@ main:
 
     BANKSEL SPBRG
     movlw   25
-    movwf   BANKMASK(SPBRG)
+    movwf   SPBRG
 
     ; Setup async serial mode
     BANKSEL TXSTA
@@ -140,11 +140,11 @@ MainLoop:
 
     ; Read received byte
     BANKSEL RCREG
-    movf    BANKMASK(RCREG), w
+    movf    RCREG, w
 
     ; Use the byte
     BANKSEL PORTB
-    movwf   BANKMASK(PORTB)
+    movwf   PORTB
 
     goto    MainLoop
 
@@ -161,7 +161,7 @@ FramingError:
     ; Check status and errors
     ; read and throw away the bad byte
     BANKSEL RCREG
-    movf    BANKMASK(RCREG), w
+    movf    RCREG, w
     BANKSEL PORTB
     bsf	    PORTB,1
     goto    MainLoop
