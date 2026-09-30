@@ -227,6 +227,7 @@ ResetI2c:
 ; IsrHandler
 ; Input:  none
 ; Output: none
+; Uses:   w_temp, status_temp
 ; These registers are in common ram so no bank switching is needed.
 ;------------------------------------------------------------------------------
 IsrHandler:
