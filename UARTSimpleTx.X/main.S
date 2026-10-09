@@ -109,8 +109,8 @@ send_loop:
     goto    send_loop
 
     ; Send ASCII '$' = 0x24
-    movlw   0x55
-    ; movlw  0x24               ; same thing, less readable because humans
+    ;movlw   0x55
+    movlw  0x02               ; same thing, less readable because humans
     BANKSEL TXREG
     movwf   TXREG
 
