@@ -37,8 +37,6 @@ CONFIG "WRT = OFF"
 user_value      EQU 0x20
 w_temp          EQU 0x70
 status_temp     EQU 0x71
-pclath_temp     EQU 0x72
-
 ;------------------------------------------------------------------------------
 ; Start of Assembly Code
 ;------------------------------------------------------------------------------
@@ -89,21 +87,17 @@ ExampleSubroutine:
 ; IsrHandler
 ; Input:  none
 ; Output: none
-; Uses:   w_temp, status_temp, pclath_temp
+; Uses:   w_temp, status_temp
 ; These registers are in common ram so no bank switching is needed.
 ;------------------------------------------------------------------------------
 IsrHandler:
     movwf   w_temp          ; save WREG
     swapf   STATUS,w        ; read STATUS with swap to avoid affecting status flags
     movwf   status_temp     ; save STATUS
-    movf    PCLATH,w        
-    movwf   pclath_temp     ; save PCLATH
 
     ; add interrupt source checks and ISR code here
 
 LeaveIsr:
-    movf    pclath_temp,w   
-    movwf   PCLATH          ; restore PCLATH
     swapf   status_temp,w   ; read saved STATUS swapping nibbles back to original
     movwf   STATUS          ; restore STATUS
     swapf   w_temp,f        ; prepare for restoring WREG without affecting flags

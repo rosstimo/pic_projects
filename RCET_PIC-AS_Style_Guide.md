@@ -735,14 +735,10 @@ IsrHandler:
     movwf   w_temp
     swapf   STATUS,w
     movwf   status_temp
-    movf    PCLATH,w
-    movwf   pclath_temp
 
     ; ISR body
 
 LeaveIsr:
-    movf    pclath_temp,w
-    movwf   PCLATH
     swapf   status_temp,w
     movwf   STATUS
     swapf   w_temp,f

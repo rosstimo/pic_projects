@@ -23,7 +23,7 @@ For the PIC16F883, the hardware interrupt vector is `0004h`. The RCET starter te
 
 ## Context save/restore
 
-The shared [`../Template_Main.S`](../Template_Main.S) preserves WREG, STATUS, and PCLATH in common RAM and restores them before `RETFIE`.
+The shared [`../Template_Main.S`](../Template_Main.S) preserves WREG and STATUS in common RAM and restores them before `RETFIE`.
 
 The STATUS-save sequence is deliberate. `MOVF` affects the Z flag, while `MOVWF` and `SWAPF` do not. Do not replace the swap-based STATUS handling with a superficially simpler sequence unless you have checked which flags that sequence changes.
 

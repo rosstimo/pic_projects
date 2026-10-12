@@ -51,7 +51,6 @@ RADIX dec ;this sets the default number base for constant/literal values. Can be
 SOMEVALUE       EQU 0x20        ; user RAM variable
 ; W_TEMP          EQU 0x70        ; WREG save (common RAM)
 ; STATUS_TEMP     EQU 0x71        ; STATUS save (common RAM)
-; PCLATH_TEMP     EQU 0x72        ; PCLATH save (common RAM)
 
 ; -------------------------
 ; Status flag bit numbers
@@ -70,8 +69,6 @@ W_TEMP:                         ; WREG save (common RAM)
     DS 1                            
 STATUS_TEMP:                     ; STATUS save (common RAM)
     DS 1
-PCLATH_TEMP:                     ; PCLATH save (common RAM)
-    DS 1
 
 PSECT udata_bank0
 rxByte:
@@ -84,7 +81,6 @@ txByteTemp:
 ;Linker Options: -Wl,-presetVect=0h,-pisrVect=04h,-pcode=08h
      
 ; --- Reset Vector --- at address 0000h so add -presetVect=0h to assembler options
-; On any Reset PCL and PCLATH default to all 0
 PSECT resetVect,class=CODE,delta=2
     GOTO Setup
     
@@ -216,13 +212,11 @@ TxByteWait:
 ; ------------------------------------------------------------
 PSECT code
 ISR_Handler:
-    ; Save context (WREG, STATUS, PCLATH)
+    ; Save context (WREG, STATUS)
     BANKSEL W_TEMP
     MOVWF W_TEMP                    ; Save WREG
     SWAPF STATUS,W              ; Save STATUS to WREG
     MOVWF STATUS_TEMP		    ; Save STATUS
-    MOVF  PCLATH,w              ; Needed when using calculated jumps like lookup tables
-    MOVWF PCLATH_TEMP           ; Save PCLATH
     ; Determine interrupt. Highest priority top down.
 
     ; Is this a UART receive interrupt?
@@ -232,10 +226,8 @@ ISR_Handler:
 
     ;----------------------------------------------------------
 LeaveISR:
-    ; Restore context (WREG, STATUS, PCLATH) and return from interrupt
+    ; Restore context (WREG, STATUS) and return from interrupt
     BANKSEL W_TEMP
-    MOVF   PCLATH_TEMP,W
-    MOVWF  PCLATH               ; Restore PCLATH
     SWAPF  STATUS_TEMP,W		
     MOVWF  STATUS               ; Restore STATUS to proper value
     SWAPF  W_TEMP,F             ; Restore W without touching status flags
