@@ -2,6 +2,7 @@
 **/nbproject/private/
 **/nbproject/Makefile-local-*.mk
 **/nbproject/Makefile-genesis.properties
+**/nbproject/*.xml
 
 # Build output directories
 build/
@@ -20,3 +21,4 @@ disassembly/
 *.elf
 *.hex
 *.map
+
