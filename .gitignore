@@ -1,24 +1,36 @@
-# MPLAB X IDE user-specific and generated files
+# MPLAB X project files required in Git:
+#   Source files, project Makefile, nbproject/project.xml,
+#   and nbproject/configurations.xml.
+# MPLAB X regenerates the files ignored below.
+
+# IDE-local settings and generated project metadata
 **/nbproject/private/
-**/nbproject/Makefile-local-*.mk
-**/nbproject/Makefile-genesis.properties
+**/nbproject/Makefile-*
+**/nbproject/Package-*
 **/nbproject/*.xml
+!**/nbproject/project.xml
+!**/nbproject/configurations.xml
 
-# Build output directories
-build/
-dist/
-
-# Debug, disassembly, and other generated output
-debug/
-disassembly/
-
-# Backup and temporary files
-*~
-*.bak
-*.swp
-
-# Compiled output and map files
+# Generated build products and directories
+**/.generated_files/
+**/build/
+**/dist/
+**/debug/
+**/disassembly/
 *.elf
 *.hex
 *.map
+*.o
+*.obj
+*.p1
+*.d
+*.lst
+*.cof
+*.cod
 
+# Editor and OS temporary files
+*~
+*.bak
+*.swp
+*.swo
+.DS_Store
